@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import base64
 import json
-from typing import Literal
+from typing import Literal, Self
 from urllib.parse import urlsplit
 
 import httpx
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 MAX_BODY_BYTES = 1024 * 1024
 REFUSAL = "The selected tool was stopped by the content gate."
@@ -20,7 +20,7 @@ class GateRefusal(RuntimeError):
 class _Response(BaseModel):
     model_config = ConfigDict(extra="allow", strict=True)
     verdict: Literal["allow", "warn", "block"]
-    latency_ms: int = Field(ge=0)
+    latency_ms: int = Field(ge=0, le=2**63 - 1)
 
 
 class _Link(BaseModel):
@@ -36,6 +36,12 @@ class _Span(BaseModel):
     start: int = Field(ge=0)
     end: int = Field(ge=0)
     family: str
+
+    @model_validator(mode="after")
+    def ordered_interval(self) -> Self:
+        if self.end < self.start:
+            raise ValueError("Invalid injection span interval")
+        return self
 
 
 class _Injection(BaseModel):

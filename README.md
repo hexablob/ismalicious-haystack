@@ -3,7 +3,7 @@
 Inspect the URL before a selected fetch tool runs, then inspect its complete textual result before the next model call. This package uses Haystack's native `before_tool` and `after_tool` hooks and IsMalicious's hosted Gate API. It requires Haystack 3.3 or later
 
 ```bash
-python -m pip install "ismalicious-haystack @ git+https://github.com/hexablob/ismalicious-haystack.git@v0.1.0"
+python -m pip install "ismalicious-haystack @ git+https://github.com/hexablob/ismalicious-haystack.git@v0.1.1"
 ```
 
 Set `ISMALICIOUS_API_KEY` and `ISMALICIOUS_API_SECRET` from [your account](https://ismalicious.com/app/account) in your secret manager. The integration serializes their environment variable names, not their values. Do not put raw secrets in a workflow or log

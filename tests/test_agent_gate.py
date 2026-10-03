@@ -252,3 +252,22 @@ def test_non_text_result_is_removed_before_refusal():
     with pytest.raises(GateRefusal):
         hook.run(state)
     assert state.get("messages") == []
+
+
+@pytest.mark.parametrize("invalid", ["backward-span", "latency-overflow"])
+def test_malformed_response_semantics_do_not_reach_next_model(invalid):
+    def handler(request):
+        if request.url.path == "/gate/url":
+            return response(request)
+        body = response(request).json()
+        if invalid == "backward-span":
+            body["injection"]["spans"] = [{"start": 9, "end": 2, "family": "instruction"}]
+        else:
+            body["latency_ms"] = 2**63
+        return httpx.Response(200, json=body)
+
+    agent, generator, calls, after = build(handler)
+    with pytest.raises(GateRefusal):
+        agent.run(messages=[ChatMessage.from_user("Fetch")])
+    assert len(generator.inputs) == 1 and calls == [URL]
+    assert all(not m.tool_call_results for m in after.state_after_refusal)
