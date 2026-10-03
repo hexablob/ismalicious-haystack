@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ismalicious-haystack"
+version = "0.1.0"
+description = "IsMalicious URL and content gate hooks for selected Haystack Agent tools"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{name = "IsMalicious"}]
+dependencies = ["haystack-ai>=3.3,<4", "httpx>=0.28,<1", "pydantic>=2.10,<3"]
+
+[project.urls]
+Source = "https://github.com/hexablob/ismalicious-haystack"
+Issues = "https://github.com/hexablob/ismalicious-haystack/issues"
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10", "pytest-asyncio>=0.26,<2", "ruff>=0.14"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120

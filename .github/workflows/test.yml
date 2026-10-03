@@ -1,0 +1,22 @@
+name: Native Agent tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    env:
+      HAYSTACK_CONTENT_TRACING_ENABLED: "false"
+      HAYSTACK_TELEMETRY_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e ".[test]"
+      - run: python -m pytest -q
+      - run: ruff check src tests examples
+      - run: ruff format --check src tests examples
